@@ -3,114 +3,51 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    flake-parts.url = "github:hercules-ci/flake-parts";
     microvm = {
       url = "github:astro/microvm.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs =
-    inputs:
-    inputs.flake-parts.lib.mkFlake { inherit inputs; } {
-      systems = [
-        "x86_64-linux"
-        "aarch64-linux"
-        "x86_64-darwin"
-        "aarch64-darwin"
+  outputs = { self, nixpkgs, microvm }:
+    let
+      system = "x86_64-linux";
+      pkgs = import nixpkgs {
+        inherit system;
+        config.allowUnfree = true;
+      };
+      lib = pkgs.lib;
+      version = "1.2.0";
+
+      # Minimal runtime dependencies for the nixcage script
+      runtimeDeps = with pkgs; [
+        bash
+        openssh
       ];
 
-      perSystem =
-        { pkgs, lib, ... }:
-        let
-          runtimeDeps = with pkgs; [
-            jq
-            coreutils
-            gnused
-            bash
-            openssh
-          ];
-        in
-        {
-          packages.default = pkgs.stdenv.mkDerivation {
-            pname = "nixcage";
-            version = "1.2.0";
-
-            src = ./.;
-
-            nativeBuildInputs = [ pkgs.makeWrapper ];
-
-            installPhase = ''
-              mkdir -p $out/bin
-              cp nixcage $out/bin/nixcage
-              chmod +x $out/bin/nixcage
-
-              wrapProgram $out/bin/nixcage \
-                --prefix PATH : ${lib.makeBinPath runtimeDeps}
-            '';
-
-            meta = {
-              description = "NixOS microVM environments for AI coding agents";
-              license = lib.licenses.gpl3Only;
-              platforms = lib.platforms.unix;
-            };
-          };
-
-          devShells.default = pkgs.mkShell {
-            buildInputs = with pkgs; [
-              bash
-              jq
-              shellcheck
-              bats
-              bats.libraries.bats-support
-              bats.libraries.bats-assert
-              openssh
-            ];
-
-            BATS_LIB_PATH = "${pkgs.bats.libraries.bats-support}/share/bats:${pkgs.bats.libraries.bats-assert}/share/bats";
-
-            shellHook = ''
-              export PATH="$PWD:$PATH"
-            '';
-          };
+      # Nixcage package derivation
+      nixcagePkg = pkgs.stdenv.mkDerivation {
+        pname = "nixcage";
+        inherit version;
+        src = ./.;
+        nativeBuildInputs = [ pkgs.makeWrapper ];
+        installPhase = ''
+          mkdir -p $out/bin
+          cp nixcage $out/bin/nixcage
+          chmod +x $out/bin/nixcage
+          wrapProgram $out/bin/nixcage \
+            --prefix PATH : ${lib.makeBinPath runtimeDeps}
+        '';
+        meta = {
+          description = "NixOS microVM environments for AI coding agents";
+          license = lib.licenses.gpl3Only;
+          platforms = lib.platforms.unix;
         };
-
-      flake.overlays.default = final: _prev: {
-        nixcage =
-          let
-            runtimeDeps = [
-              final.jq
-              final.coreutils
-              final.gnused
-              final.bash
-              final.openssh
-            ];
-          in
-          final.stdenv.mkDerivation {
-            pname = "nixcage";
-            version = "1.2.0";
-
-            src = ./.;
-
-            nativeBuildInputs = [ final.makeWrapper ];
-
-            installPhase = ''
-              mkdir -p $out/bin
-              cp nixcage $out/bin/nixcage
-              chmod +x $out/bin/nixcage
-
-              wrapProgram $out/bin/nixcage \
-                --prefix PATH : ${final.lib.makeBinPath runtimeDeps}
-            '';
-
-            meta = {
-              description = "NixOS microVM environments for AI coding agents";
-              license = final.lib.licenses.gpl3Only;
-              platforms = final.lib.platforms.unix;
-            };
-          };
       };
+    in
+    {
+      packages.${system}.default = nixcagePkg;
 
-      flake.nixosModules.base = import ./modules/vm-base.nix;
+      nixosModules.base = import ./modules/vm-base.nix;
     };
 }

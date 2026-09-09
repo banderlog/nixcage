@@ -6,8 +6,12 @@ This is fork of original v1.2.0 (before contaners) with some flake tweaks:
 - "x86_64-linux" only
 - nothing preinstalled except `bash` and `openssh`
 - no devshell and overlay
-- no hooks on dir enter in bash file
 - more examples
+
+nixcage.sh changes:
+- no macOS
+- no hooks on dir enter
+- bugfix: broken terminal input after VM SSH waiting
 
 ---
 

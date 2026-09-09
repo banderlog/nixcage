@@ -1,5 +1,15 @@
 # nixcage
 
+Author of original repo decided to switch from microVM to containers: <https://github.com/hamidr/nixcage/issues/1>
+
+This is fork of original v1.2.0 (before contaners) with some tweaks:
+- "x86_64-linux" only
+- nothing preinstalled except `bash` and `openssh`
+- no devshell and overlay
+- more examples
+
+---
+
 NixOS microVM environments for AI coding agents.
 Enter a project directory and your terminal switches into a full NixOS VM -- isolated at the kernel level, driven entirely by a Nix flake you control.
 

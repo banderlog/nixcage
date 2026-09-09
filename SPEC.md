@@ -50,9 +50,7 @@ nixcage <command> [args...]
 | `sync`                 | Compare config hash to last build; rebuild and restart if stale, else no-op.|
 | `logs`                 | `tail -f` the VM stdout/stderr log.                                         |
 | `status`               | Print project path, nix system, hypervisor, share proto, ssh port, build/run state. |
-| `install-hook [--remove]` | Append (or remove) the cd auto-enter hook in `~/.zshrc` or `~/.bashrc`.  |
 | `destroy [dir]`        | Stop the VM, remove `nixcage.vm.nix` and `.nixcage-vm/`, prune `.gitignore` entry. |
-| `_vm_hook [zsh\|bash]` | (Internal) Emit hook code to stdout for manual `eval` installation.         |
 | `version`, `--version`, `-v` | Print `nixcage <version>`.                                            |
 | `help`, `--help`, `-h` | Print usage summary.                                                        |
 
@@ -94,7 +92,7 @@ unbound variable terminates the process.
 ```
 
 `nixcage.vm.nix` is the presence signal for a nixcage project. Its existence is
-what `find_vm_root()` and the shell hook detect.
+what `find_vm_root()` detect.
 
 ### 4.1 `.nixcage-vm/config`
 
@@ -240,41 +238,6 @@ per-project ed25519 key. `vm_ssh()` always passes:
 Login user is always `nixcage`. The host key is accepted on first connection
 (`accept-new`) by `vm_wait_for_ssh()` and verified strictly thereafter.
 
-## 9. Shell hook (auto-enter)
-
-`nixcage install-hook` appends a delimited block to the user's shell rc file
-(`~/.zshrc` for zsh, `~/.bashrc` for bash). The block is bounded by
-`# nixcage-hook-begin` and `# nixcage-hook-end` so `--remove` can excise it
-cleanly. Re-running `install-hook` is idempotent.
-
-### 9.1 zsh hook
-
-Uses `chpwd` via `add-zsh-hook`. Fires on every directory change.
-
-### 9.2 bash hook
-
-Uses `PROMPT_COMMAND`. Tracks the last `$PWD` to fire only on directory change.
-
-### 9.3 Hook logic (both shells)
-
-```
-if [[ -f "$PWD/nixcage.vm.nix" ]] && [[ -z "${NIXCAGE_VM_ACTIVE:-}" ]]; then
-  export NIXCAGE_VM_ACTIVE=1
-  nixcage shell
-  unset NIXCAGE_VM_ACTIVE
-fi
-```
-
-`NIXCAGE_VM_ACTIVE` is a re-entry guard. Without it, exiting the VM SSH session
-would land back in the host shell which would immediately re-invoke
-`nixcage shell` again.
-
-### 9.4 Manual installation
-
-`nixcage _vm_hook [zsh|bash]` emits the hook body to stdout. Users who manage
-their dotfiles externally can `eval "$(nixcage _vm_hook zsh)"` instead of
-letting nixcage edit their rc file.
-
 ## 10. Destroy
 
 `nixcage destroy [dir]`:
@@ -334,7 +297,7 @@ host paths the user explicitly adds to `microvm.shares` in `nixcage.vm.nix`.
 
 | Variable             | Scope            | Value                                       |
 | -------------------- | ---------------- | ------------------------------------------- |
-| `NIXCAGE_VM_ACTIVE`  | Host shell hook  | `1` while inside a `nixcage shell` session  |
+| `NIXCAGE_VM_ACTIVE`  | Host shell  | `1` while inside a `nixcage shell` session  |
 | Each `SECRET_VARS` entry | Inside VM    | Forwarded value, sourced by login shells    |
 
 ### 12.2 Read by nixcage
@@ -342,7 +305,5 @@ host paths the user explicitly adds to `microvm.shares` in `nixcage.vm.nix`.
 | Variable                            | Used by             | Purpose                                    |
 | ----------------------------------- | ------------------- | ------------------------------------------ |
 | `PWD`                               | `find_vm_root`      | Walk-up search start                       |
-| `HOME`                              | `cmd_install_hook`  | Locate `~/.zshrc` / `~/.bashrc`            |
-| `SHELL`                             | `cmd_install_hook`  | Pick zsh vs bash hook block                |
 | `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `OPENCODE_API_KEY`, `GITHUB_TOKEN` | `vm_detect_ai_keys` (init), `vm_inject_secrets` (start) | Auto-detect and forward |
 | Each name in `SECRET_VARS`          | `vm_inject_secrets` | Read value from host env, push to VM       |

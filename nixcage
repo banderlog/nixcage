@@ -428,8 +428,7 @@ VMCONF
   log_info ""
   log_info "Next steps:"
   log_info "  1. nixcage build              (once; first run takes 15+ minutes)"
-  log_info "  2. nixcage install-hook       (adds auto-enter hook to shell rc)"
-  log_info "  3. nixcage shell              (starts VM if needed, then enters it)"
+  log_info "  2. nixcage shell              (starts VM if needed, then enters it)"
 }
 
 cmd_build() {

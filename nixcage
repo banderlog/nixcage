@@ -225,7 +225,7 @@ vm_wait_for_ssh() {
   local deadline=$((SECONDS + timeout))
   log_info "Waiting for VM SSH..."
   while [[ $SECONDS -lt $deadline ]]; do
-    if ssh -p "$VM_SSH_PORT" -i "$key" \
+    if ssh -n -p "$VM_SSH_PORT" -i "$key" \
          -o "UserKnownHostsFile=$known_hosts" \
          -o "StrictHostKeyChecking=accept-new" \
          -o "ConnectTimeout=5" \
@@ -467,7 +467,7 @@ cmd_build() {
   rm -rf "$build_dir"
 
   # Record a hash of the inputs so 'nixcage start' can warn on staleness.
-  vm_compute_build_hash "$project_dir" >"$vm_dir/build-hash"
+  vm_compute_build_hash "$project_dir" > "$vm_dir/build-hash"
 
   log_ok "VM built. Run 'nixcage shell' to enter the VM."
 }
@@ -524,7 +524,7 @@ cmd_start() {
   (
     cd "$project_dir/$NIXCAGE_VM_DIR"
     vm_start_virtiofsd "$project_dir" "$result"
-    "$runner" >"$log_file" 2>&1 &
+    "$runner" >"$log_file" 2>&1 < /dev/null &
     echo "$!" >"$pid_file"
   )
 

@@ -6,7 +6,7 @@ This file provides guidance to Claude Code when working with code in this reposi
 
 nixcage is a single-file Bash tool that boots a NixOS microVM for each project and
 auto-enters it when you `cd` into the directory. It uses microvm.nix as the VM
-backend (cloud-hypervisor on Linux, QEMU on macOS). The primary use case is running
+backend (cloud-hypervisor on Linux). The primary use case is running
 AI coding agents (claude-code, opencode) in full VM-level isolation with
 reproducible, Nix-managed environments.
 
@@ -20,24 +20,11 @@ isolation primitive.
 - `modules/vm-base.nix` -- NixOS module applied to every nixcage VM. Provides
   claude-code, git, nodejs, openssh, the nixcage user, the /workspace virtiofs
   mount, and the secrets injection service.
-- `flake.nix` -- flake-parts flake that packages nixcage, exports
-  `nixosModules.base`, and defines the dev shell.
+- `flake.nix` -- flake-parts flake that packages nixcage.
 - `docs/` -- ADRs and TRACKER.md.
 
 ## Development
 
-### Enter the dev shell
-
-```bash
-nix develop   # provides bash, jq, shellcheck, bats, openssh
-```
-
-### Lint & test
-
-```bash
-shellcheck nixcage
-bats --recursive tests/
-```
 
 There is no build step -- the script runs directly.
 
@@ -100,12 +87,10 @@ the hook code to stdout for manual `eval` installation.
 
 ### Platform branching
 
-`detect_os()` echoes `"linux"` or `"macos"`; captured at top-level as
+`detect_os()` echoes `"linux"`; captured at top-level as
 `OS="$(detect_os)"`. `cmd_init` branches on `$OS` to choose `hypervisor`
-(cloud-hypervisor vs. qemu). Linux uses virtiofs, macOS uses 9p (virtiofsd
-is Linux-only). On macOS, `microvm.vmHostPackages` is set to the Darwin nixpkgs
-so the runner (qemu) is a macOS-native binary while the guest remains
-aarch64-linux. The choice is written into `.nixcage-vm/config` and baked
+(cloud-hypervisor). Linux uses virtiofs.
+The choice is written into `.nixcage-vm/config` and baked
 into the generated flake. At runtime the script is platform-agnostic --
 it only manages the VM process and SSH.
 

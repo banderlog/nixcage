@@ -17,7 +17,7 @@
         config.allowUnfree = true;
       };
       lib = pkgs.lib;
-      version = "1.2.0";
+      version = "1.2.1";
 
       # Minimal runtime dependencies for the nixcage script
       runtimeDeps = with pkgs; [
@@ -41,7 +41,7 @@
         meta = {
           description = "NixOS microVM environments for AI coding agents";
           license = lib.licenses.gpl3Only;
-          platforms = lib.platforms.unix;
+          platforms = [ "x86_64-linux" ];
         };
       };
     in

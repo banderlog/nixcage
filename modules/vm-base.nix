@@ -7,16 +7,9 @@
   environment.systemPackages =
     with pkgs;
     [
-      claude-code
-      git
-      nodejs_22
-      jq
-      curl
       bash
       openssh
     ]
-    ## opencode is relatively new; skip gracefully if nixpkgs doesn't carry it yet
-    ++ lib.optionals (pkgs ? opencode) [ pkgs.opencode ];
 
   services.openssh = {
     enable = true;

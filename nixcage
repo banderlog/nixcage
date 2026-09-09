@@ -3,7 +3,7 @@
 
 set -euo pipefail
 
-NIXCAGE_VERSION="1.2.0"
+NIXCAGE_VERSION="1.2.1"
 NIXCAGE_VM_DIR=".nixcage-vm"
 
 RED=$'\033[0;31m'
@@ -386,7 +386,7 @@ EOF
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixcage = {
-      url = "github:hamidr/nixcage";
+      url = "github:banderlog/nixcage";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     microvm = {

@@ -4,12 +4,10 @@
 {
   nixpkgs.config.allowUnfree = true;
 
-  environment.systemPackages =
-    with pkgs;
-    [
-      bash
-      openssh
-    ];
+  environment.systemPackages = with pkgs; [
+    bash
+    openssh
+  ];
 
   services.openssh = {
     enable = true;

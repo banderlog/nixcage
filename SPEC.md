@@ -4,8 +4,8 @@ Version: 1.2.1
 
 ## 1. Purpose
 
-nixcage boots a NixOS microVM per project directory and auto-enters it when the
-user `cd`s into the directory. It uses [microvm.nix](https://github.com/astro/microvm.nix)
+nixcage boots a NixOS microVM per project directory.
+It uses [microvm.nix](https://github.com/astro/microvm.nix)
 as the VM backend (cloud-hypervisor on Linux). The primary use
 case is running AI coding agents (claude-code, opencode) in full VM-level
 isolation with reproducible, Nix-managed environments.
@@ -176,7 +176,7 @@ The `result` symlink points at the hypervisor runner script.
 3. Resolve runner: prefer `result/bin/microvm-run` if executable, else `result` itself.
 4. Launch runner in background: `"$runner" >vm.log 2>&1 &`. Save `$!` to `vm.pid`.
 5. `vm_wait_for_ssh()`: poll `ssh ... true` every 2s until success. Timeout
-   120s on Linux, 300s on macOS. If the runner process dies first, abort with
+   120s on Linux. If the runner process dies first, abort with
    pointer to `vm.log`.
    - `known_hosts` is truncated before polling because the VM regenerates host
      keys each boot. `StrictHostKeyChecking=accept-new` accepts and persists

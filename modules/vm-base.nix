@@ -9,7 +9,7 @@
     [
       bash
       openssh
-    ]
+    ];
 
   services.openssh = {
     enable = true;

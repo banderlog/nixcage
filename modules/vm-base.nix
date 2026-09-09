@@ -27,9 +27,8 @@
 
   security.sudo.wheelNeedsPassword = false;
 
-  ## /workspace mount is declared by the generated per-project flake via
-  ## microvm.shares -- do not duplicate it here. The share proto (virtiofs
-  ## on Linux, 9p on macOS) varies by platform.
+  ## /workspace mount is declared by the generated per-project flake via microvm.shares
+  ## do not duplicate it here.
 
   ## Copies /run/nixcage-secrets (piped in by 'nixcage start') into
   ## /etc/profile.d/ so every login shell picks up the API keys.

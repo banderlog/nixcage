@@ -2,10 +2,11 @@
 
 Author of original repo decided to switch from microVM to containers: <https://github.com/hamidr/nixcage/issues/1>
 
-This is fork of original v1.2.0 (before contaners) with some tweaks:
+This is fork of original v1.2.0 (before contaners) with some flake tweaks:
 - "x86_64-linux" only
 - nothing preinstalled except `bash` and `openssh`
 - no devshell and overlay
+- no hooks on dir enter in bash file
 - more examples
 
 ---

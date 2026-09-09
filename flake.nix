@@ -38,11 +38,6 @@
           wrapProgram $out/bin/nixcage \
             --prefix PATH : ${lib.makeBinPath runtimeDeps}
         '';
-        meta = {
-          description = "NixOS microVM environments for AI coding agents";
-          license = lib.licenses.gpl3Only;
-          platforms = [ "x86_64-linux" ];
-        };
       };
     in
     {

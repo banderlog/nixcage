@@ -408,6 +408,16 @@ FLAKE
   # microvm.mem = 4096;
   # microvm.vcpu = 4;
 
+  ## Enable the native NixOS firewall inside the VM example
+  #networking.firewall.enable = true;
+  #networking.firewall.extraCommands = ''
+  #  # Whitelist specific egress endpoints (added -p tcp to fix --dport)
+  #  iptables -I OUTPUT -d 192.168.0.1 -p tcp --dport 443 -j ACCEPT
+  #
+  #  # Block outbound connections to common private network ranges (RFC 1918)
+  #  iptables -A OUTPUT -d 192.168.0.0/16 -j REJECT
+  '';
+
   ## Mount extra host paths
   # microvm.shares = [{
   #   tag = "home-ssh";

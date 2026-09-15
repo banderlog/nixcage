@@ -424,6 +424,7 @@ FLAKE
   #   source = "/home/me/.ssh";
   #   mountPoint = "/home/nixcage/.ssh";
   #   proto = "virtiofs";
+  #   readOnly = true;
   # }];
 }
 VMCONF

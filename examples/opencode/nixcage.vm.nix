@@ -16,7 +16,12 @@ let
     export OPENCODE_STATE_DIR="/workspace/.opencode/state"
     export OPENCODE_DB="/workspace/.opencode/data/opencode.db"
     export OPENCODE_AUTH_JSON="/workspace/.opencode/data/auth.json"
-    exec opencode -c "$@"
+    mkdir -p "$OPENCODE_CONFIG_DIR" \
+             "$OPENCODE_DATA_DIR" \
+             "$OPENCODE_CACHE_DIR" \
+             "$OPENCODE_LOG_DIR" \
+             "$OPENCODE_STATE_DIR"
+    exec opencode "$@"
   '';
 in
 {
